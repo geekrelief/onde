@@ -51,6 +51,7 @@
     font-family: Courier, "Courier New", monospace;
     width: 44em;
     height: 42.5em;
+    color: #444;
 }
 
 .onde-panel .field.number .value input[type=text].value-input,

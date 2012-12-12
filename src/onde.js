@@ -134,6 +134,9 @@ onde.Onde.prototype.render = function (schema, data, opts) {
     this.panelElement.empty();
     this.instanceId = this._generateFieldId();
     this.initialRendering = true;
+    if (typeof this.documentSchema != "object") {
+        this._error("Schema must be an object");
+    }
     this.renderObject(this.documentSchema, this.panelElement, this.instanceId, 
         this.documentInstance);
     this.initialRendering = false;
@@ -142,6 +145,10 @@ onde.Onde.prototype.render = function (schema, data, opts) {
     }
 };
 
+onde.Onde.prototype._error = function (msg) {
+    alert("Error: " + msg);
+    throw new Error(msg);
+}
 
 onde.Onde.prototype.getSchema = function (schemaURL) {
     //TODO: Implement schema management
@@ -476,7 +483,7 @@ onde.Onde.prototype.renderFieldValue = function (fieldName, fieldInfo, parentNod
             fieldValueNode = this.renderEnumField(fieldName, fieldInfo, valueData);
         } else {
             //TODO: Format
-            if (fieldInfo.format == 'multiline') {
+            if (fieldInfo.format == 'multiline' || fieldInfo.format == 'code') {
                 fieldValueNode = $('<textarea></textarea>');
             } else {
                 fieldValueNode = $('<input type="text" />');
@@ -493,7 +500,14 @@ onde.Onde.prototype.renderFieldValue = function (fieldName, fieldInfo, parentNod
             }
             if (fieldInfo['default']) {
                 //TODO: Check the type
-                fieldValueNode.attr('placeholder', fieldInfo['default']);
+                if (fieldInfo.type == 'string' && (fieldInfo.format == 'multiline' || fieldInfo.format == 'code')) {
+                    fieldValueNode.val(fieldInfo['default']);
+                    if (fieldInfo.format == 'code') {
+                        fieldValueNode.addClass('code');
+                    }
+                } else {
+                    fieldValueNode.attr('placeholder', fieldInfo['default']);
+                }
             }
             /*if (fieldInfo.format) {
                 fieldValueNode.addClass(fieldInfo.format);
@@ -537,7 +551,7 @@ onde.Onde.prototype.renderFieldValue = function (fieldName, fieldInfo, parentNod
             if (fieldInfo.title) {
                 fieldValueNode.attr('title', fieldInfo.title);
             }
-            if (fieldInfo['default']) {
+            if (fieldInfo['default'] != null) {
                 //TODO: Check the type
                 fieldValueNode.attr('placeholder', fieldInfo['default']);
             }
@@ -879,12 +893,12 @@ onde.Onde.prototype.onAddObjectProperty = function (handle) {
     var propName = $('#' + baseId + '-key').val();
     if (!propName) {
         //TODO: Nice [unobstrusive] error message
-        alert("Property name must not be empty");
+        this._error("Property name must not be empty");
         return;
     }
     if (!propName.match(/^[a-z_][a-z0-9_]+$/i)) {
         //TODO: Nice [unobstrusive] error message
-        alert("Invalid property name");
+        this._error("Invalid property name");
         return;
     }
     var namespace = handle.attr('data-object-namespace');

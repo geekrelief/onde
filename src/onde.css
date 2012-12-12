@@ -43,9 +43,16 @@
 /*    font-size: 1.17em; */
 }
 .onde-panel .field .value textarea.value-input {
-    height: 2.5em;
+    height: 12.5em;
     vertical-align: top;
 }
+
+.onde-panel .field .value textarea.value-input.code {
+    font-family: Courier, "Courier New", monospace;
+    width: 44em;
+    height: 42.5em;
+}
+
 .onde-panel .field.number .value input[type=text].value-input,
 .onde-panel .field.integer .value input[type=text].value-input {
     font-family: Courier, "Courier New", monospace;

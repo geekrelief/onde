@@ -73,56 +73,76 @@ onde.Onde = function (formElement, schema, documentInst, opts) {
     this.documentSchema = schema;
     this.documentInstance = documentInst;
     // Object property adder
-    this.panelElement.find('.property-add').live('click', function (evt) {
-        evt.preventDefault();
-        _inst.onAddObjectProperty($(this));
-    });
+    this.panelElement.find('.property-add').live('click', _inst, this.onClickPropertyAdd);
+
     // Array item adder
-    this.panelElement.find('.item-add').live('click', function (evt) {
-        evt.preventDefault();
-        _inst.onAddListItem($(this));
-    });
+    this.panelElement.find('.item-add').live('click', _inst, this.onClickItemAdd);
+
     // Collapsible field (object and array)
-    this.panelElement.find('.collapser').live('click', function (evt) {
-        var collapser = $(this);
-        var fieldId = collapser.attr('data-fieldvalue-container-id');
-        //TODO: Check the field. It must not be inline.
-        if (fieldId) {
-            // Check the state first (for smoother animations)
-            if (collapser.hasClass('collapsed')) {
-                collapser.removeClass('collapsed');
-                $('#' + fieldId).slideDown('fast');
-            } else {
-                //TODO: Display indicator (and/or summary) when collapsed
-                $('#' + fieldId).slideUp('fast', function () {
-                    collapser.addClass('collapsed');
-                });
-            }
-        }
-    });
+    this.panelElement.find('.collapser').live('click', _inst, this.onClickCollapser);
+
     // Field deleter (property and item)
-    this.panelElement.find('.field-delete').live('click', function (evt) {
-        evt.preventDefault();
-        evt.stopPropagation(); //CHECK: Only if collapsible
-        $('#' + $(this).attr('data-id')).fadeOut('fast', function () {
-            // Change the item's and siblings' classes accordingly
-            //FIXME: This is unstable
-            if ($(this).hasClass('first')) {
-                $(this).next('li.field').addClass('first');
-            }
-            if ($(this).hasClass('last')) {
-                $(this).prev('li.field').addClass('last');
-            }
-            $(this).remove();
-        });
-    });
+    this.panelElement.find('.field-delete').live('click', _inst, this.onClickFieldDelete);
+
     // Type selector
-    this.panelElement.find('.field-type-select').live('change', function (evt) {
-        evt.preventDefault();
-        _inst.onFieldTypeChanged($(this));
-    });
+    this.panelElement.find('.field-type-select').live('change', _inst, this.onClickFieldTypeSelect);
+
     //this.panelElement.hide();
 };
+
+onde.Onde.prototype.onClickPropertyAdd = function(evt) {
+    evt.preventDefault();
+    evt.data.onAddObjectProperty($(evt.target));
+}
+
+onde.Onde.prototype.onClickItemAdd = function(evt) {
+    evt.preventDefault();
+    evt.data.onAddListItem($(evt.target));
+}
+
+onde.Onde.prototype.onClickCollapser = function(evt) {
+    var collapser = $(evt.target);
+    var fieldId = collapser.attr('data-fieldvalue-container-id');
+    //TODO: Check the field. It must not be inline.
+    if (fieldId) {
+        // Check the state first (for smoother animations)
+        if (collapser.hasClass('collapsed')) {
+            collapser.removeClass('collapsed');
+            $('#' + fieldId).slideDown('fast');
+        } else {
+            //TODO: Display indicator (and/or summary) when collapsed
+            $('#' + fieldId).slideUp('fast', function () {
+                collapser.addClass('collapsed');
+            });
+        }
+    }
+}
+
+onde.Onde.prototype.onClickFieldDelete = function(evt) {
+    evt.preventDefault();
+    evt.stopPropagation(); //CHECK: Only if collapsible
+    $('#' + $(evt.target).attr('data-id')).fadeOut('fast', function () {
+        // Change the item's and siblings' classes accordingly
+        //FIXME: This is unstable
+        if ($(evt.target).hasClass('first')) {
+            $(evt.target).next('li.field').addClass('first');
+        }
+        if ($(evt.target).hasClass('last')) {
+            $(evt.target).prev('li.field').addClass('last');
+        }
+        $(evt.target).remove();
+    });
+}
+
+onde.Onde.prototype.onClickFieldDelete = function(evt) {
+    evt.preventDefault();
+    evt.data.onFieldTypeChanged($(evt.target));
+}
+
+onde.Onde.prototype.onClickFieldTypeSelect = function(evt) {
+    evt.preventDefault();
+    evt.data.onFieldTypeChanged($(this));
+}
 
 onde.Onde.prototype.render = function (schema, data, opts) {
     this.documentSchema = schema || this.documentSchema;
@@ -1225,3 +1245,15 @@ onde.Onde.prototype.tr = function (text) {
     // Translations go here
     return text;
 };
+
+onde.Onde.prototype.destroy = function() {
+    this.panelElement.find('.property-add').die();
+
+    this.panelElement.find('.item-add').die();
+
+    this.panelElement.find('.collapser').die();
+
+    this.panelElement.find('.field-delete').die();
+
+    this.panelElement.find('.field-type-select').die();
+}

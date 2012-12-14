@@ -121,22 +121,18 @@ onde.Onde.prototype.onClickCollapser = function(evt) {
 onde.Onde.prototype.onClickFieldDelete = function(evt) {
     evt.preventDefault();
     evt.stopPropagation(); //CHECK: Only if collapsible
+    var target = evt.target;
     $('#' + $(evt.target).attr('data-id')).fadeOut('fast', function () {
         // Change the item's and siblings' classes accordingly
         //FIXME: This is unstable
-        if ($(evt.target).hasClass('first')) {
-            $(evt.target).next('li.field').addClass('first');
+        if ($(target).hasClass('first')) {
+            $(target).next('li.field').addClass('first');
         }
-        if ($(evt.target).hasClass('last')) {
-            $(evt.target).prev('li.field').addClass('last');
+        if ($(target).hasClass('last')) {
+            $(target).prev('li.field').addClass('last');
         }
-        $(evt.target).remove();
+        $(this).remove();
     });
-}
-
-onde.Onde.prototype.onClickFieldDelete = function(evt) {
-    evt.preventDefault();
-    evt.data.onFieldTypeChanged($(evt.target));
 }
 
 onde.Onde.prototype.onClickFieldTypeSelect = function(evt) {
